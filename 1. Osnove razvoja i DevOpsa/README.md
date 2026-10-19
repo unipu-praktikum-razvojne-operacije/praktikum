@@ -16,4 +16,4 @@ Ishodi učenja koje tjedan pokriva: 1 (prepoznati koncepte i alate), 2 (razlikov
 - Naziv repozitorija: `praktikum-<github-korisnik>`.
 
 ## Predaja (praktični zadatak 1)
-Osobni repozitorij `praktikum-<github-korisnik>` u organizaciji, s `README.md`, `.gitignore`, `check_env.sh`, izlazom provjere (`check_env.txt`), te `.github/workflows/release_please.yml` i `version.txt`. Na kraju bloka postoji izdanje `v0.1.0`.
+Osobni repozitorij `praktikum-<github-korisnik>` u organizaciji, s `README.md`, `.gitignore`, `check_env.sh`, izlazom provjere (`check_env.txt`), te `.github/workflows/release_please.yml` i `version.txt`. Na kraju bloka postoji izdanje `v1.0.0`.
