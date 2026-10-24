@@ -84,8 +84,8 @@ curl -s http://localhost:11434/api/chat -d '{
 Radimo u osobnom repozitoriju iz tjedna 1, na novoj grani (konvencija iz bloka A):
 ```bash
 cd ~/praktikum-$(gh api user -q .login)
-git switch main && git pull
-git switch -c feature/ollama-client
+git checkout main && git pull
+git checkout -b feature/ollama-client
 source .venv/bin/activate
 pip install requests python-dotenv pytest
 pip freeze > requirements.txt
@@ -343,7 +343,7 @@ gh pr create --base main --title "feat: add Ollama client, CLI and tests" --body
 ```
 PR spojiti sam (osobni repozitorij) strategijom kolegija: fast-forward kad je moguć, inače merge commit. To radi `git merge` bez opcija; GitHub PR sam označi kao *merged*:
 ```bash
-git switch main && git pull
+git checkout main && git pull
 git merge feature/ollama-client     # here main has not moved, so this is a fast-forward
 git push origin main
 ```

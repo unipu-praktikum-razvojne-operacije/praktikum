@@ -22,7 +22,7 @@ cd "$(git rev-parse --show-toplevel)"
 branch=$(git branch --show-current)
 if [ -z "$branch" ] || [ "$branch" = "main" ]; then
   echo "ERROR: you are on '${branch:-detached HEAD}'. Work on your own branch:" >&2
-  echo "  git switch -c feature/\$(gh api user -q .login)" >&2
+  echo "  git checkout -b feature/\$(gh api user -q .login)" >&2
   exit 1
 fi
 

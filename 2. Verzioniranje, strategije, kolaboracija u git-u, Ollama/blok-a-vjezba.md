@@ -58,7 +58,7 @@ git branch -a              # local main + remote origin/main
 Ime grane slijedi konvenciju `feature/<github-korisnik>`; tako se iz popisa grana odmah vidi tko na čemu radi.
 ```bash
 GITHUB_USERNAME=$(gh api user -q .login)
-git switch -c "feature/$GITHUB_USERNAME"
+git checkout -b "feature/$GITHUB_USERNAME"
 git branch                 # * marks the current branch (HEAD)
 ```
 
@@ -109,13 +109,13 @@ Nositelj dijeli ekran, odobrava (Review → Approve) i spaja prva tri PR-a s tri
 Ostale PR-ove nositelj spaja strategijom kolegija: **fast-forward kad je moguć, inače merge commit**. Upravo to radi `git merge` bez opcija. GitHubov gumb *Create a merge commit* uvijek radi merge commit (`--no-ff`), pa se spaja lokalno. GitHub PR sam označi kao *merged* čim se njegovi commitovi pojave na `main`:
 ```bash
 git fetch origin
-git switch main && git pull
+git checkout main && git pull
 git merge origin/feature/<github-korisnik>   # fast-forward if main has not moved, otherwise a merge commit
 git push origin main                        # admin bypasses branch protection (enforce_admins: false)
 ```
 Nakon svakog spajanja svi povlače `main`:
 ```bash
-git switch main
+git checkout main
 git pull                             # output says: Fast-forward
 git log --graph --oneline --all
 ```
@@ -124,7 +124,7 @@ Usporediti graf s vizualizacijama iz predavanja: gdje je ravna linija, gdje je r
 ## 6. Zaostala grana: rebase i `--force-with-lease`
 Svaki spojeni PR pomiče `main`, pa su ostale grane "iza". Na stranici PR-a vidi se *This branch is out-of-date with the base branch*. Za strategiju kolegija to nije problem (spajanje tada napravi merge commit), ali ovdje vježbamo rebase vlastite grane kao alternativu:
 ```bash
-git switch "feature/$GITHUB_USERNAME"
+git checkout "feature/$GITHUB_USERNAME"
 git log --oneline -2                 # note the two hashes
 git fetch origin
 git rebase origin/main               # replay your 2 commits on top of the new main
@@ -140,7 +140,7 @@ Spojen PR u `shared-collab` s vlastitom datotekom (vidljivo u `git log --oneline
 | Simptom | Rješenje |
 |---|---|
 | `error: invalid path '2026-...T..:..:...txt'` | Repozitorij je kloniran izvan WSL-a (Git for Windows). Klonirati u WSL-u u `~/` |
-| `ERROR: you are on 'main'` | `git switch -c feature/<github-korisnik>` pa ponovno pokrenuti skriptu |
+| `ERROR: you are on 'main'` | `git checkout -b feature/<github-korisnik>` pa ponovno pokrenuti skriptu |
 | `protected branch hook declined` | Očekivano za push na `main`; pushati vlastitu granu i otvoriti PR |
 | `gh pr create`: *must first push the current branch* | `git push -u origin HEAD` |
 | `! [rejected] (non-fast-forward)` nakon rebasea | `git push --force-with-lease` |
