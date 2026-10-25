@@ -14,6 +14,7 @@
 > 3. `docker build --target test .` završava s `6 passed`.
 > 4. `docker run --rm praktikum-llm --version` ispisuje istu verziju, a `pip show praktikum-llm` u slici pokazuje instalirani paket.
 > 5. Runtime slika nema izvorni kod: `docker run --rm --entrypoint ls praktikum-llm /app /src` javlja da direktoriji ne postoje.
+> 6. Poruka završnog commita i naslov PR-a slijede Conventional Commits i povećavaju **minor** verziju.
 >
 > **Predaja:** otvoren PR. Ne spajati ga sami; PR je predaja i ostaje otvoren za pregled.
 
@@ -252,17 +253,18 @@ Ključna ideja: **build once, deploy many**. Isti wheel (ili ista slika s istim 
   echo "## no source";     docker run --rm --entrypoint ls praktikum-llm /app /src 2>&1
 } | tee docker.txt
 ```
+**Poruka završnog commita.** Završni commit mora prema specifikaciji [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/#summary) povećati **minor** verziju (`x.Y.z`): kad se PR spoji u `main`, release-please (tjedan 1) otvara release PR s novom minor verzijom u `version.txt`. Koji tip (prefiks) poruke to postiže, pronađite sami u specifikaciji; u naredbama ispod umjesto njega piše `<type>`. Isti prefiks koristite i u naslovu PR-a.
 ```bash
 git add -A
 git status                       # .env, .venv, dist/, build/, *.egg-info must NOT be listed
-git commit -m "feat: package the CLI as praktikum_llm"
+git commit -m "<type>: package the CLI as praktikum_llm"
 git push -u origin HEAD
 BASE=feature/docker              # use main if the block B PR is already merged
-gh pr create --base "$BASE" --title "feat: package the CLI as praktikum_llm" --body "Week 3, block C. Checks: see docker.txt"
+gh pr create --base "$BASE" --title "<type>: package the CLI as praktikum_llm" --body "Week 3, block C. Checks: see docker.txt"
 ```
 Kad nastavnik spoji PR iz bloka B, GitHub ovaj PR automatski preusmjeri na `main` (ako se grana `feature/docker` pri spajanju obriše) ili ga treba ručno preusmjeriti: `gh pr edit --base main`.
 
-**Predaja (praktični zadatak 3, dio C):** otvoren PR iz `feature/python-package` s datotekama iz ishoda i `docker.txt` koji potvrđuje svih pet kriterija. PR ne spajati sami.
+**Predaja (praktični zadatak 3, dio C):** otvoren PR iz `feature/python-package` s datotekama iz ishoda i `docker.txt` koji potvrđuje kriterije 1–5 (kriterij 6 provjerava se iz poruke commita i naslova PR-a). PR ne spajati sami.
 
 ## Česti problemi
 | Simptom | Rješenje |

@@ -58,7 +58,7 @@ Ishodi učenja koje tjedan pokriva: 1 (prepoznati koncepte i alate: kontejneriza
 - Polazište je stanje osobnog repozitorija nakon spojenog PR-a iz tjedna 2 (`ollama_client.py`, `llm.py`, `tests/`, `requirements.txt`, `version.txt`).
 
 ## Predaja (praktični zadatak 3)
-- Blok B: otvoren pull request iz `feature/docker` u `main`, s `docker.txt` koji potvrđuje svih pet kriterija.
-- Blok C: otvoren pull request iz `feature/python-package` (prema `feature/docker` dok PR iz bloka B nije spojen), s `docker.txt` koji potvrđuje svih pet kriterija.
+- Blok B: otvoren pull request iz `feature/docker` u `main`, s `docker.txt` koji potvrđuje kriterije 1–5 (kriterij 6 provjerava se iz poruke commita i naslova PR-a).
+- Blok C: otvoren pull request iz `feature/python-package` (prema `feature/docker` dok PR iz bloka B nije spojen), s `docker.txt` koji potvrđuje kriterije 1–5 (kriterij 6 provjerava se iz poruke commita i naslova PR-a).
 
 PR-ove ne spajati sami; ostaju otvoreni za pregled.

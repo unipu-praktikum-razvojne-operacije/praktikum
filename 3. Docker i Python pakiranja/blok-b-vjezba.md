@@ -15,6 +15,7 @@
 > 3. `docker run --rm --entrypoint id praktikum-llm` ispisuje `uid=10001(app)`, ne `root`.
 > 4. `llm status` iz kontejnera javlja `Ollama is running`.
 > 5. `docker stop` zaustavlja kontejner za manje od sekunde (izlazni kod `143`, ne `137`).
+> 6. Poruka završnog commita i naslov PR-a slijede Conventional Commits i povećavaju **minor** verziju.
 >
 > **Predaja:** otvoren PR. Ne spajati ga sami; PR je predaja i ostaje otvoren za pregled.
 
@@ -320,14 +321,15 @@ Izlaz provjera ide u `docker.txt` (kao `pytest.txt` u tjednu 2):
 } | tee docker.txt
 ```
 (Na Docker Desktopu zamijeniti `--network host` s `-e OLLAMA_BASE_URL=http://host.docker.internal:11434`.)
+**Poruka završnog commita.** Završni commit mora prema specifikaciji [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/#summary) povećati **minor** verziju (`x.Y.z`): kad se PR spoji u `main`, release-please (tjedan 1) otvara release PR s novom minor verzijom u `version.txt`. Koji tip (prefiks) poruke to postiže, pronađite sami u specifikaciji; u naredbama ispod umjesto njega piše `<type>`. Isti prefiks koristite i u naslovu PR-a.
 ```bash
 git add Dockerfile .dockerignore llm.py ollama_client.py requirements.txt requirements-dev.txt tests/ docker.txt
 git status                       # .env and .venv must NOT be listed
-git commit -m "feat: containerize the CLI with a multi-stage Dockerfile and add --version"
+git commit -m "<type>: containerize the CLI with a multi-stage Dockerfile and add --version"
 git push -u origin HEAD
-gh pr create --base main --title "feat: containerize the CLI" --body "Week 3, block B. Checks: see docker.txt"
+gh pr create --base main --title "<type>: containerize the CLI" --body "Week 3, block B. Checks: see docker.txt"
 ```
-**Predaja (praktični zadatak 3, dio B):** otvoren PR iz `feature/docker` u `main` repozitorija `praktikum-<github-korisnik>`, s datotekama iz ishoda i `docker.txt` koji potvrđuje svih pet kriterija. PR ne spajati sami.
+**Predaja (praktični zadatak 3, dio B):** otvoren PR iz `feature/docker` u `main` repozitorija `praktikum-<github-korisnik>`, s datotekama iz ishoda i `docker.txt` koji potvrđuje kriterije 1–5 (kriterij 6 provjerava se iz poruke commita i naslova PR-a). PR ne spajati sami.
 
 **Dodatni zadatak:** objaviti sliku u GitHub Container Registry.
 ```bash
