@@ -202,6 +202,9 @@ RUN python -m pytest -v
 
 # ---- runtime: only the installed package, running as a non-root user ----
 FROM ${PYTHON_IMAGE} AS runtime
+# PYTHONDONTWRITEBYTECODE: do not write .pyc files; they only add size to the image layer.
+# PYTHONUNBUFFERED: send stdout/stderr straight to the container log instead of buffering,
+# so `docker logs` shows output immediately (and nothing is lost if the process is killed).
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 RUN adduser -D -u 10001 app

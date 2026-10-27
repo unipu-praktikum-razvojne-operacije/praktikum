@@ -86,7 +86,7 @@ docker run -d --name toolbox tools:0.1 sleep infinity
 docker ps
 docker exec -it toolbox sh               # a second process inside the same container
   git --version; ps; exit
-docker stop toolbox                      # takes about 10 s: sleep ignores SIGTERM as PID 1 (more in step 3)
+docker stop toolbox                      # takes about 1 s: sleep ignores SIGTERM as PID 1 (more in step 3)
 docker ps -a                             # stopped, but still exists
 docker rm toolbox
 ```
@@ -160,11 +160,11 @@ docker run --rm --env-file .env -e OLLAMA_BASE_URL=http://host.docker.internal:1
 **SIGTERM i PID 1.** Pokrenuti interaktivni chat u pozadini i zaustaviti ga:
 ```bash
 docker run -d -it --name chat1 --network host --env-file .env praktikum-llm chat
-time docker stop chat1                    # about 10 s
+time docker stop chat1                    # about 1 s, then SIGKILL
 docker inspect -f '{{.State.ExitCode}}' chat1   # 137 = 128 + 9 (SIGKILL)
 docker rm chat1
 ```
-`docker stop` šalje SIGTERM procesu PID 1, čeka 10 s i onda šalje SIGKILL. Python kao PID 1 nema zadani handler za SIGTERM, a kernel PID-u 1 ne primjenjuje zadanu akciju, pa signal ignorira. U produkciji to znači sporije isporuke i prekinute zahtjeve. Brzo rješenje bez promjene koda je `docker run --init` (mali init proces prosljeđuje signale); pravo rješenje je handler u kodu (korak 4).
+`docker stop` šalje SIGTERM procesu PID 1, čeka 1 s i onda šalje SIGKILL. (Vrijeme čekanja je stop timeout kontejnera, `--stop-timeout`; na nekim instalacijama zadano je 10 s.) Python kao PID 1 nema zadani handler za SIGTERM, a kernel PID-u 1 ne primjenjuje zadanu akciju, pa signal ignorira. U produkciji to znači sporije isporuke i prekinute zahtjeve. Brzo rješenje bez promjene koda je `docker run --init` (mali init proces prosljeđuje signale); pravo rješenje je handler u kodu (korak 4).
 
 Pogledati i veličinu: `docker images praktikum-llm`. Slika sadrži i `pytest` jer je `requirements.txt` nastao s `pip freeze` u razvojnom okruženju; to popravljamo u koraku 5.
 
@@ -203,10 +203,10 @@ def main() -> int:
     args = build_parser().parse_args()
     ...
 ```
-**Zadane vrijednosti.** Ako `ollama_client.py` ima `DEFAULT_BASE_URL = os.getenv(...)`, zamijeniti doslovnim vrijednostima; okolina (`-e`, `--env-file`, `.env`) ih samo nadjačava:
+**Zadane vrijednosti.** Ako `ollama_client.py` ima `DEFAULT_BASE_URL = ""http://localhost:11434""`, zamijeniti vrijednostima iz okoline (`-e`, `--env-file`, `.env`):
 ```python
-DEFAULT_BASE_URL = "http://localhost:11434"
-DEFAULT_MODEL = "llama3.2:1b"
+DEFAULT_BASE_URL = os.getenv("DEFAULT_BASE_URL")
+DEFAULT_MODEL = os.getenv("DEFAULT_MODEL", "llama3.2:1b")
 ```
 **Testovi.** Novi [`tests/test_version.py`](docker-lab/blok-b/tests/test_version.py):
 ```python
@@ -259,6 +259,9 @@ ARG PYTHON_IMAGE=python:3.13-alpine
 
 # ---- base: runtime dependencies, shared by the two stages below ----
 FROM ${PYTHON_IMAGE} AS base
+# PYTHONDONTWRITEBYTECODE: do not write .pyc files; they only add size to the image layer.
+# PYTHONUNBUFFERED: send stdout/stderr straight to the container log instead of buffering,
+# so `docker logs` shows output immediately (and nothing is lost if the process is killed).
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 WORKDIR /app
@@ -351,6 +354,6 @@ docker rmi "$IMAGE" && docker pull "$IMAGE"     # the registry now holds the ima
 | `host.docker.internal` ne radi na Linuxu | Dodati `--add-host=host.docker.internal:host-gateway`; Ollama tada mora slušati i izvan `127.0.0.1` (`OLLAMA_HOST=0.0.0.0`), pa radije `--network host` |
 | `ModuleNotFoundError: No module named 'llm'` u testovima | Pokretati `python -m pytest` iz korijena repozitorija; u Dockerfileu `tests/` mora biti pod `WORKDIR /app` |
 | `llm 0.0.0` u kontejneru | `version.txt` nije kopiran u sliku: dodati ga u `COPY` u fazama `test` i `runtime` |
-| `docker stop` i dalje traje 10 s | `ENTRYPOINT` u shell obliku (`ENTRYPOINT llm`) pokreće `sh` kao PID 1; koristiti JSON oblik `["llm"]` |
+| `docker stop` i dalje čeka puni timeout (izlazni kod 137) | `ENTRYPOINT` u shell obliku (`ENTRYPOINT llm`) pokreće `sh` kao PID 1; koristiti JSON oblik `["llm"]` |
 | Svaki build ponovno instalira ovisnosti | `COPY . .` prije `pip install` poništava cache; kopirati prvo samo `requirements.txt`, kod na kraju |
 | `exec format error` | Slika je za drugu arhitekturu (npr. `arm64` s Maca na `amd64` VM-u): `docker build --platform linux/amd64 ...` |
