@@ -318,7 +318,7 @@ Izlaz provjera ide u `docker.txt` (kao `pytest.txt` u tjednu 2):
   echo "## user";    docker run --rm --entrypoint id praktikum-llm
   echo "## status";  docker run --rm --network host praktikum-llm status 2>&1
   echo "## stop";    docker run -d -it --name chk --network host praktikum-llm chat >/dev/null
-                     sleep 2   # let Python start and install its SIGTERM handler
+                     sleep 2
                      ( TIMEFORMAT="stopped in %R s"; time docker stop chk >/dev/null ) 2>&1
                      docker inspect -f 'exit code {{.State.ExitCode}}' chk; docker rm chk >/dev/null
 } | tee docker.txt
